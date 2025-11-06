@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简单贴文串</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>简单的贴文串💬</h1>
+        </header>
+
+        <section id="new-thread-form">
+            <h2>发新贴文</h2>
+            <input type="text" id="thread-author" placeholder="你的名字 (留空则为 匿名)">
+            <textarea id="thread-content" placeholder="输入你的贴文内容..." required></textarea>
+            <button onclick="postThread()">发表</button>
+        </section>
+
+        <hr>
+
+        <section id="threads-container">
+            </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
