@@ -1,81 +1,199 @@
+:root {
+    --primary-color: #3b82f6; /* Tailwind Blue-500 */
+    --secondary-color: #10b981; /* Tailwind Emerald-500 */
+    --background-light: #f3f4f6;
+    --card-bg: #ffffff;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --border-color: #e5e7eb;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f7f9;
-    color: #333;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-light);
+    color: var(--text-dark);
     line-height: 1.6;
     margin: 0;
-    padding: 20px;
+    padding: 20px 0;
 }
 
 .container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
-    background: #fff;
-    padding: 20px 30px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    padding: 20px;
 }
 
 header h1 {
     text-align: center;
-    color: #007bff;
-    margin-bottom: 20px;
+    color: var(--primary-color);
+    margin-bottom: 30px;
+    font-size: 2.5rem;
+    padding-bottom: 10px;
 }
 
-/* 帖子/回复表单样式 */
-#new-thread-form input[type="text"],
-#new-thread-form textarea,
-.reply-form input[type="text"],
-.reply-form textarea {
+/* Forms */
+#new-thread-form, .reply-form {
+    background: var(--card-bg);
+    padding: 25px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+h2 {
+    color: var(--text-dark);
+    margin-top: 0;
+    font-size: 1.5rem;
+}
+
+input[type="text"], textarea {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box; /* 确保 padding 不会增加总宽度 */
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    resize: vertical;
 }
 
+input[type="text"]:focus, textarea:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+/* Buttons */
 button {
-    background-color: #007bff;
+    background-color: var(--primary-color);
     color: white;
-    padding: 10px 15px;
+    padding: 10px 20px;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
+    font-size: 1rem;
+    transition: background-color 0.2s, transform 0.1s;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #2563eb;
 }
 
-/* 贴文和回复的样式 */
-.thread-post, .reply-post {
-    border: 1px solid #e0e0e0;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 6px;
-    background-color: #f9f9f9;
+button:active {
+    transform: scale(0.98);
 }
 
+/* Post Styling */
 .thread-post {
-    border-left: 5px solid #007bff;
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    background-color: var(--card-bg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.thread-header, .reply-header {
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 5px;
-}
-
-.thread-content, .reply-content {
+.thread-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 10px;
 }
 
+.author-info {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.timestamp {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-left: 10px;
+}
+
+.thread-content {
+    margin-bottom: 15px;
+    padding: 10px 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Markdown Styling */
+.thread-content a {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+.thread-content strong {
+    font-weight: bold;
+    color: var(--text-dark);
+}
+
+/* Delete Button */
+.delete-btn {
+    background-color: transparent;
+    color: #ef4444; /* Tailwind Red-500 */
+    padding: 5px 10px;
+    font-size: 0.85rem;
+}
+
+.delete-btn:hover {
+    color: #dc2626;
+    background-color: transparent;
+}
+
+/* Replies Section */
 .replies-section {
-    margin-left: 20px;
-    border-left: 2px dashed #ccc;
-    padding-left: 10px;
-    margin-top: 10px;
+    margin-top: 20px;
+    padding-left: 15px;
+    border-left: 3px solid var(--border-color);
+}
+
+.reply-post {
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 8px;
+    background-color: var(--background-light);
+    border: 1px solid var(--border-color);
+}
+
+.reply-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+}
+
+/* --- Responsive Design (for mobile) --- */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    .container {
+        padding: 10px;
+    }
+    header h1 {
+        font-size: 2rem;
+    }
+    .thread-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .timestamp {
+        margin-left: 0;
+        margin-top: 5px;
+    }
+    .delete-btn {
+        margin-top: 5px;
+        align-self: flex-end;
+    }
+    .reply-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }

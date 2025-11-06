@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'simpleThreadData';
+const STORAGE_KEY = 'simpleThreadDataV2';
 
 function loadData() {
     const data = localStorage.getItem(STORAGE_KEY);
@@ -9,6 +9,22 @@ function saveData(threads) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(threads));
 }
 
+// NEW FUNCTION: Converts simple Markdown to HTML
+function parseMarkdown(text) {
+    let html = text;
+    // 1. **Bold**
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // 2. *Italics*
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    // 3. [Link Text](URL)
+    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+    
+    // Convert new lines to <br> for better display
+    html = html.replace(/\n/g, '<br>');
+
+    return html;
+}
+
 function renderThreads() {
     const threads = loadData();
     const container = document.getElementById('threads-container');
@@ -17,20 +33,25 @@ function renderThreads() {
     threads.forEach(thread => {
         const threadEl = document.createElement('div');
         threadEl.className = 'thread-post';
+
+        // Apply Markdown conversion before displaying content
+        const contentHTML = parseMarkdown(thread.content);
+
         threadEl.innerHTML = `
             <div class="thread-header">
-                <span>${thread.author || '匿名用户'}</span>
-                <span>
+                <div class="author-info">
+                    ${thread.author || 'Anonymous'}
                     <span class="timestamp">${new Date(thread.timestamp).toLocaleString()}</span>
-                    <button class="delete-btn" onclick="deleteThread('${thread.id}')">删除</button>
-                </span>
+                </div>
+                <button class="delete-btn" onclick="deleteThread('${thread.id}')">Delete</button>
             </div>
-            <div class="thread-content">${thread.content}</div>
-            <button onclick="toggleReplyForm('${thread.id}')">回复</button>
-            <div id="reply-form-${thread.id}" class="reply-form" style="display:none; margin-top: 10px;">
-                <input type="text" id="reply-author-${thread.id}" placeholder="你的名字 (留空则为 匿名)">
-                <textarea id="reply-content-${thread.id}" placeholder="输入回复内容..." required></textarea>
-                <button onclick="postReply('${thread.id}')">提交回复</button>
+            <div class="thread-content">${contentHTML}</div>
+            
+            <button onclick="toggleReplyForm('${thread.id}')">Reply</button>
+            <div id="reply-form-${thread.id}" class="reply-form" style="display:none; margin-top: 15px;">
+                <input type="text" id="reply-author-${thread.id}" placeholder="Your Name (Anonymous if empty)">
+                <textarea id="reply-content-${thread.id}" placeholder="Enter your reply..." required></textarea>
+                <button onclick="postReply('${thread.id}')">Submit Reply</button>
             </div>
             <div class="replies-section" id="replies-${thread.id}">
                 </div>
@@ -48,15 +69,19 @@ function renderReplies(threadId, replies) {
     replies.forEach((reply, index) => {
         const replyEl = document.createElement('div');
         replyEl.className = 'reply-post';
+
+        // Apply Markdown conversion to replies
+        const replyContentHTML = parseMarkdown(reply.content);
+
         replyEl.innerHTML = `
             <div class="reply-header">
-                <span>${reply.author || '匿名用户'}</span>
-                <span>
+                <div class="author-info">
+                    ${reply.author || 'Anonymous'}
                     <span class="timestamp">${new Date(reply.timestamp).toLocaleString()}</span>
-                    <button class="delete-btn" onclick="deleteReply('${threadId}', ${index})">删除</button>
-                </span>
+                </div>
+                <button class="delete-btn" onclick="deleteReply('${threadId}', ${index})">Delete</button>
             </div>
-            <div class="reply-content">${reply.content}</div>
+            <div class="reply-content">${replyContentHTML}</div>
         `;
         repliesContainer.appendChild(replyEl);
     });
@@ -70,7 +95,7 @@ function postThread() {
     const content = contentInput.value.trim();
 
     if (content === '') {
-        alert('贴文内容不能为空！');
+        alert('Content cannot be empty!');
         return;
     }
 
@@ -83,7 +108,7 @@ function postThread() {
     };
 
     const threads = loadData();
-    threads.unshift(newThread);
+    threads.unshift(newThread); // Add new thread to the top
 
     saveData(threads);
 
@@ -106,7 +131,7 @@ function postReply(threadId) {
     const content = contentInput.value.trim();
 
     if (content === '') {
-        alert('回复内容不能为空！');
+        alert('Reply content cannot be empty!');
         return;
     }
 
@@ -132,7 +157,7 @@ function postReply(threadId) {
 }
 
 function deleteThread(threadId) {
-    if (!confirm('确定要删除这条贴文吗？')) {
+    if (!confirm('Are you sure you want to delete this blink?')) {
         return;
     }
     
@@ -144,7 +169,7 @@ function deleteThread(threadId) {
 }
 
 function deleteReply(threadId, replyIndex) {
-    if (!confirm('确定要删除这条回复吗？')) {
+    if (!confirm('Are you sure you want to delete this reply?')) {
         return;
     }
 
@@ -152,7 +177,6 @@ function deleteReply(threadId, replyIndex) {
     const threadIndex = threads.findIndex(t => t.id === threadId);
 
     if (threadIndex > -1) {
-        // 使用 splice(index, 1) 删除指定索引的回复
         threads[threadIndex].replies.splice(replyIndex, 1);
         saveData(threads);
         renderThreads();

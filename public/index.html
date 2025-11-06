@@ -1,25 +1,23 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>简单贴文串</title>
+    <title>Simple Thread Board - Upgraded</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>简单的贴文串💬</h1>
+            <h1>Micro-Blink Board</h1>
         </header>
 
         <section id="new-thread-form">
-            <h2>发新贴文</h2>
-            <input type="text" id="thread-author" placeholder="你的名字 (留空则为 匿名)">
-            <textarea id="thread-content" placeholder="输入你的贴文内容..." required></textarea>
-            <button onclick="postThread()">发表</button>
+            <h2>Post a New Blink</h2>
+            <input type="text" id="thread-author" placeholder="Your Name (Optional)">
+            <textarea id="thread-content" placeholder="What's on your mind? (Supports **bold**, *italics*, and [links](url))" required></textarea>
+            <button onclick="postThread()">Post Blink</button>
         </section>
-
-        <hr>
 
         <section id="threads-container">
             </section>
