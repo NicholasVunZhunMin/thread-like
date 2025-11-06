@@ -1,33 +1,31 @@
-// 1. 定义存储键名
 const STORAGE_KEY = 'simpleThreadData';
 
-// 2. 加载数据
 function loadData() {
     const data = localStorage.getItem(STORAGE_KEY);
-    // 如果本地有数据，就解析并返回；否则返回一个空数组
     return data ? JSON.parse(data) : [];
 }
 
-// 3. 保存数据
 function saveData(threads) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(threads));
 }
 
-// 4. 渲染所有贴文
 function renderThreads() {
     const threads = loadData();
     const container = document.getElementById('threads-container');
-    container.innerHTML = ''; // 清空现有内容
+    container.innerHTML = '';
 
     threads.forEach(thread => {
-        // 创建贴文元素
         const threadEl = document.createElement('div');
         threadEl.className = 'thread-post';
         threadEl.innerHTML = `
             <div class="thread-header">
-                ${thread.author || '匿名用户'} - <span>${new Date(thread.timestamp).toLocaleString()}</span>
+                <span>${thread.author || '匿名用户'}</span>
+                <span>
+                    <span class="timestamp">${new Date(thread.timestamp).toLocaleString()}</span>
+                    <button class="delete-btn" onclick="deleteThread('${thread.id}')">删除</button>
+                </span>
             </div>
-            <div class="thread-content">${thread.content.replace(/\n/g, '<br>')}</div>
+            <div class="thread-content">${thread.content}</div>
             <button onclick="toggleReplyForm('${thread.id}')">回复</button>
             <div id="reply-form-${thread.id}" class="reply-form" style="display:none; margin-top: 10px;">
                 <input type="text" id="reply-author-${thread.id}" placeholder="你的名字 (留空则为 匿名)">
@@ -39,30 +37,31 @@ function renderThreads() {
         `;
         container.appendChild(threadEl);
 
-        // 渲染回复
         renderReplies(thread.id, thread.replies || []);
     });
 }
 
-// 5. 渲染回复
 function renderReplies(threadId, replies) {
     const repliesContainer = document.getElementById(`replies-${threadId}`);
     repliesContainer.innerHTML = '';
 
-    replies.forEach(reply => {
+    replies.forEach((reply, index) => {
         const replyEl = document.createElement('div');
         replyEl.className = 'reply-post';
         replyEl.innerHTML = `
             <div class="reply-header">
-                ${reply.author || '匿名用户'} - <span>${new Date(reply.timestamp).toLocaleString()}</span>
+                <span>${reply.author || '匿名用户'}</span>
+                <span>
+                    <span class="timestamp">${new Date(reply.timestamp).toLocaleString()}</span>
+                    <button class="delete-btn" onclick="deleteReply('${threadId}', ${index})">删除</button>
+                </span>
             </div>
-            <div class="reply-content">${reply.content.replace(/\n/g, '<br>')}</div>
+            <div class="reply-content">${reply.content}</div>
         `;
         repliesContainer.appendChild(replyEl);
     });
 }
 
-// 6. 发表新贴文
 function postThread() {
     const authorInput = document.getElementById('thread-author');
     const contentInput = document.getElementById('thread-content');
@@ -76,7 +75,7 @@ function postThread() {
     }
 
     const newThread = {
-        id: Date.now().toString(), // 使用时间戳作为唯一ID
+        id: Date.now().toString(),
         author: author,
         content: content,
         timestamp: new Date().toISOString(),
@@ -84,24 +83,21 @@ function postThread() {
     };
 
     const threads = loadData();
-    threads.unshift(newThread); // 新贴文放在最前面
+    threads.unshift(newThread);
 
     saveData(threads);
 
-    // 清空表单
     authorInput.value = '';
     contentInput.value = '';
 
-    renderThreads(); // 重新渲染页面
+    renderThreads();
 }
 
-// 7. 切换回复表单的显示/隐藏
 function toggleReplyForm(threadId) {
     const form = document.getElementById(`reply-form-${threadId}`);
     form.style.display = form.style.display === 'none' ? 'block' : 'none';
 }
 
-// 8. 提交回复
 function postReply(threadId) {
     const authorInput = document.getElementById(`reply-author-${threadId}`);
     const contentInput = document.getElementById(`reply-content-${threadId}`);
@@ -124,19 +120,43 @@ function postReply(threadId) {
     const threadIndex = threads.findIndex(t => t.id === threadId);
 
     if (threadIndex > -1) {
-        threads[threadIndex].replies.push(newReply); // 回复放在贴文后面
+        threads[threadIndex].replies.push(newReply);
         saveData(threads);
 
-        // 清空表单并隐藏
         authorInput.value = '';
         contentInput.value = '';
         document.getElementById(`reply-form-${threadId}`).style.display = 'none';
 
-        renderThreads(); // 重新渲染
+        renderThreads();
     }
 }
 
-// 9. 页面加载完成后立即运行
-document.addEventListener('DOMContentLoaded', renderThreads);
+function deleteThread(threadId) {
+    if (!confirm('确定要删除这条贴文吗？')) {
+        return;
+    }
+    
+    let threads = loadData();
+    threads = threads.filter(t => t.id !== threadId);
+    
+    saveData(threads);
+    renderThreads();
+}
 
-// 10. 额外：在控制台输入 localStorage.clear(); renderThreads(); 可以清空所有数据
+function deleteReply(threadId, replyIndex) {
+    if (!confirm('确定要删除这条回复吗？')) {
+        return;
+    }
+
+    const threads = loadData();
+    const threadIndex = threads.findIndex(t => t.id === threadId);
+
+    if (threadIndex > -1) {
+        // 使用 splice(index, 1) 删除指定索引的回复
+        threads[threadIndex].replies.splice(replyIndex, 1);
+        saveData(threads);
+        renderThreads();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', renderThreads);
